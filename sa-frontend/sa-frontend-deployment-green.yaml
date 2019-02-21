@@ -1,0 +1,26 @@
+# open in browser: minikube service sa-frontend-lb
+# rollback history: kubectl rollout history deployment sa-frontend
+# roll back: kubectl rollout undo deployment sa-frontend --to-revision=1
+apiVersion: extensions/v1beta1
+kind: Deployment                                          # 1
+metadata:
+  name: sa-frontend
+spec:
+  replicas: 2                                             # 2
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate                                   # 3
+    rollingUpdate:
+      maxUnavailable: 1                                   # 4
+      maxSurge: 1                                         # 5
+  template:                                               # 6
+    metadata:
+      labels:
+        app: sa-frontend                                  # 7
+    spec:
+      containers:
+        - image: rinormaloku/sentiment-analysis-frontend:green
+          imagePullPolicy: Always                         # 8
+          name: sa-frontend
+          ports:
+            - containerPort: 80

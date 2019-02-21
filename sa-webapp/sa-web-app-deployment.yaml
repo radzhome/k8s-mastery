@@ -1,0 +1,27 @@
+#  kubectl apply -f sa-web-app-deployment.yaml --record
+apiVersion: extensions/v1beta1
+kind: Deployment                                          # 1
+metadata:
+  name: sa-webapp
+spec:
+  replicas: 2                                             # 2
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate                                   # 3
+    rollingUpdate:
+      maxUnavailable: 1                                   # 4
+      maxSurge: 1                                         # 5
+  template:                                               # 6
+    metadata:
+      labels:
+        app: sa-webapp                                  # 7
+    spec:
+      containers:
+        - image: rinormaloku/sentiment-analysis-web-app
+          imagePullPolicy: Always
+          name: sa-web-app
+          env:
+            - name: SA_LOGIC_API_URL
+              value: "http://sa-logic"
+          ports:
+            - containerPort: 8080
